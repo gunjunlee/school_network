@@ -11,7 +11,7 @@ def sendtoDelay(sock, data, addr):
 	#0.2의 확률로 패킷 드랍
 	if(random.randrange(1, 6) < 5):
 		#0~1초 사이에서 uniform distribution 따르도록 delay 줌
-		time.sleep(random.uniform(0, 1))
+		time.sleep(random.uniform(0, 2))
 		#패킷 답장
 		sock.sendto(data, addr)
 		print ("Server: reply \"" + data.decode('utf-8') + "\"")
