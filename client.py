@@ -31,7 +31,7 @@ for i in range(0, 10):
         dt_after = datetime.now()
         dt_diff = difftimemilli(dt_after, dt_before)
         #print ("Client: recv \"" + data.decode('utf-8') + "\" ")
-        print ("Client: recv \"" + data.decode('utf-8') + "\" " + str(dt_diff))
+        print ("Client: recv \"" + data.decode('utf-8') + "\" diff: " + str(dt_diff))
     except Exception as e:
         print("package dropped")
         print(e)
