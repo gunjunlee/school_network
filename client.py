@@ -13,17 +13,25 @@ def difftimemilli(dt_after, dt_before):
     return milli
 
 #패킷을 서버에 전송하고 받는 함수
-def ping(RTTlist, sock, i):
+def ping(RTTlist, i):
 
     # seq#가 기록되어 있는 message 생성
     message = "Ping #" + str(i)
+
+    #UDP 소켓 엶
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    #UPD timeout 값 설정
+    print(waittime)
+    sock.settimeout(waittime)
+
     try:
         #패킷 전송 직전 시간
         dt_before = datetime.now();
 
         #패킷 송신
         sock.sendto(message.encode(), (server_ip, server_port))
-        print ("Client: send \"" + message + "\"")
+        print ("#" + str(i) + "Client: send \"" + message + "\"")
 
         #답장되어 오는 패킷 수신.
         data, addr = sock.recvfrom(1024)
@@ -33,7 +41,7 @@ def ping(RTTlist, sock, i):
 
         #패킷 송신 직전과 수신 직후 시간 차이(=RTT) 구함
         dt_diff = difftimemilli(dt_after, dt_before)
-        print ("Client: recv \"" + data.decode('utf-8') + "\" diff: " + str(dt_diff))
+        print ("#" + str(i) + " Client: recv \"" + data.decode('utf-8') + "\" diff: " + str(dt_diff))
 
         #패킷 잘 받았을 경우 RTT 기록함
         RTTlist.append(dt_diff)
@@ -42,6 +50,9 @@ def ping(RTTlist, sock, i):
     except Exception as e:
         print("package dropped: seq#", i)
         print(e)
+
+    #UDP 소켓 닫음.
+    sock.close()
 
 #waittime 기본값 1000ms
 waittime = 1
@@ -79,18 +90,12 @@ else:
     print("server_port is not defined")
     exit()
 
-#UDP 소켓 엶
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-#UPD timeout 값 설정
-sock.settimeout(waittime)
-
 #스레드 리스트
 threadlist = []
 
 #패킷 전송 스레드 10개 생성
 for i in range(0, 10):
-    t = threading.Thread(target=ping, args=(RTTlist, sock, i))
+    t = threading.Thread(target=ping, args=(RTTlist, i))
     threadlist.append(t)
     t.start()
 
@@ -102,9 +107,6 @@ for i in range(0, 10):
 if(len(RTTlist) == 0):
     print("there is no packet replied, cannot get average RTT")
     exit()
-
-#UDP 소켓 닫음.
-sock.close()
 
 #averageRTT 구함
 sumRTT = 0
