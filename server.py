@@ -2,13 +2,16 @@
 import socket
 import time
 import threading
+import random
 
 def sendtoDelay(sock, data, addr):
 	print ("Server: recv \"" + data.decode('utf-8') + "\"")
-	time.sleep(0.5)
-	sock.sendto(data, addr)
-	print ("Server: reply \"" + data.decode('utf-8') + "\"")
-
+	if(random.randrange(1, 6) < 5):
+		time.sleep(random.random())
+		sock.sendto(data, addr)
+		print ("Server: reply \"" + data.decode('utf-8') + "\"")
+	else:
+		print("Server: drop \"" + data.decode('utf-8') + "\"")
 
 server_ip = "127.0.0.1"
 server_port = 5005
@@ -22,6 +25,7 @@ while True:
 	# time.sleep(0.5)
 	# sock.sendto(data, addr)
 	# print ("Server: reply \"" + data.decode('utf-8') + "\"")
-	sendtoDelay(sock, data, addr)
+	t1 = threading.Thread(target=sendtoDelay, args=(sock, data, addr))
+	t1.start()
 
 raw_input("server exit")
