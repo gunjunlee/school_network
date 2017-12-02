@@ -3,6 +3,8 @@ import socket
 import time
 from datetime import datetime
 import threading
+import getopt
+import sys
 
 def difftimemilli(dt_after, dt_before):
     dt = dt_after - dt_before;
@@ -26,11 +28,36 @@ def ping(RTTlist, sock, i):
         print("package dropped: seq#", i)
         print(e)
 
+waittime = 1
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "c:p:w:")
+except getopt.GetoptError as err:
+    print(str(err))
+    exit()
+for opt, arg in opts:
+    if(opt == "-c"):
+        server_ip = str(arg)
+    elif(opt == "-p"):
+        server_port = int(arg)
+    elif(opt == "-w"):
+        waittime = float(arg) / 1000
+
 RTTlist = []
-server_ip = "127.0.0.1"
-server_port = 5005
+if 'server_ip' in globals():
+    pass
+else:
+    print("server_ip is not defined")
+    exit()
+
+if 'server_port' in globals():
+    pass
+else:
+    print("server_port is not defined")
+    exit()
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.settimeout(1)
+sock.settimeout(waittime)
 threadlist = []
 
 #dtb = datetime.now()
@@ -45,6 +72,10 @@ for i in range(0, 10):
 
 for i in range(0, 10):
     threadlist[i].join()
+
+if(len(RTTlist) == 0):
+    print("there is no packet replied, cannot get average RTT")
+    exit()
 
 sumRTT = 0
 averageRTT = 0
