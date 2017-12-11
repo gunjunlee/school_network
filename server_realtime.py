@@ -9,8 +9,9 @@ import numpy
 def sendtoDelay(sock, data, addr):
 	print ("Server: recv \"" + data.decode('utf-8') + "\"")
 
-	#0.2의 확률로 패킷 드랍
-	if(random.randrange(1, 6) < 5):
+    #0.2의 확률로 패킷 드랍
+	prob = random.uniform(0, 0.2*2);
+	if(random.uniform(0, 1) > prob):
 		#0~1초 사이에서 uniform distribution 따르도록 delay 줌
 		time.sleep(numpy.random.lognormal(0.1, 1))
 		#패킷 답장
