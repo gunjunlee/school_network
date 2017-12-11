@@ -3,6 +3,7 @@ import socket
 import time
 import threading
 import random
+import numpy
 
 #딜레이를 가지고 패킷 답장하는 함수
 def sendtoDelay(sock, data, addr):
@@ -11,7 +12,7 @@ def sendtoDelay(sock, data, addr):
 	#0.2의 확률로 패킷 드랍
 	if(random.randrange(1, 6) < 5):
 		#0~1초 사이에서 uniform distribution 따르도록 delay 줌
-		time.sleep(random.uniform(0, 0.2))
+		time.sleep(numpy.random.lognormal(0.1, 1))
 		#패킷 답장
 		sock.sendto(data, addr)
 		print ("Server: reply \"" + data.decode('utf-8') + "\"")

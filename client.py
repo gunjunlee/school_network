@@ -12,9 +12,45 @@ def difftimemilli(dt_after, dt_before):
     milli = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
     return milli
 
-#패킷을 서버에 전송하고 받는 함수
-def ping(RTTlist, i):
+#waittime 기본값 1000ms
+waittime = 1
 
+#opt 설정
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "c:p:w:")
+    
+#설정 안 된 opt 있을 경우 예외 처리
+except getopt.GetoptError as err:
+    print(str(err))
+    exit()
+
+#opt 받아 옴
+for opt, arg in opts:
+    if(opt == "-c"):
+        server_ip = str(arg)
+    elif(opt == "-p"):
+        server_port = int(arg)
+    elif(opt == "-w"):
+        waittime = float(arg) / 1000
+
+#RTT 저장하기 위한 리스트
+RTTlist = []
+
+#server_ip 설정되지 않은 경우 처리
+if 'server_ip' in globals():
+    pass
+else:
+    print("server_ip is not defined")
+    exit()
+
+#server_port 설정되지 않은 경우 처리
+if 'server_port' in globals():
+    pass
+else:
+    print("server_port is not defined")
+    exit()
+
+for i in range(0, 10):
     # seq#가 기록되어 있는 message 생성
     message = "Ping #" + str(i)
 
@@ -52,55 +88,6 @@ def ping(RTTlist, i):
 
     #UDP 소켓 닫음.
     sock.close()
-
-#waittime 기본값 1000ms
-waittime = 1
-
-#opt 설정
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "c:p:w:")
-#설정 안 된 opt 있을 경우 예외 처리
-except getopt.GetoptError as err:
-    print(str(err))
-    exit()
-#opt 받아 옴
-for opt, arg in opts:
-    if(opt == "-c"):
-        server_ip = str(arg)
-    elif(opt == "-p"):
-        server_port = int(arg)
-    elif(opt == "-w"):
-        waittime = float(arg) / 1000
-
-#RTT 저장하기 위한 리스트
-RTTlist = []
-
-#server_ip 설정되지 않은 경우 처리
-if 'server_ip' in globals():
-    pass
-else:
-    print("server_ip is not defined")
-    exit()
-
-#server_port 설정되지 않은 경우 처리
-if 'server_port' in globals():
-    pass
-else:
-    print("server_port is not defined")
-    exit()
-
-#스레드 리스트
-threadlist = []
-
-#패킷 전송 스레드 10개 생성
-for i in range(0, 10):
-    t = threading.Thread(target=ping, args=(RTTlist, i))
-    threadlist.append(t)
-    t.start()
-
-#모든 스레드 종료 기다림.
-for i in range(0, 10):
-    threadlist[i].join()
 
 #모든 패킷이 timeout 된 경우 처리.
 if(len(RTTlist) == 0):
